@@ -29,8 +29,11 @@ const windowManager = require('./../window-manager');
 
 const iconExt = (environment.platform.IS_WINDOWS) ? 'ico' : 'png';
 
-const iconPath = path.join(app.getAppPath(), 'img', ('tray.' + iconExt));
-const iconBadgePath = path.join(app.getAppPath(), 'img', ('tray.badge.' + iconExt));
+const iconName = (process.platform === 'darwin') ? 'tray-Template.' : 'tray.';
+const iconBadgeName = (process.platform === 'darwin') ? 'tray.badge-Template.' : 'tray.';
+
+const iconPath = path.join(app.getAppPath(), 'img', (iconName + iconExt));
+const iconBadgePath = path.join(app.getAppPath(), 'img', (iconBadgeName + iconExt));
 const iconOverlayPath = path.join(app.getAppPath(), 'img', 'taskbar.overlay.png');
 
 let lastUnreadCount = 0;
@@ -38,22 +41,20 @@ let lastUnreadCount = 0;
 let appIcon = null;
 
 const _createTrayIcon = () => {
-  if (!environment.platform.IS_MAC_OS) {
-    appIcon = new Tray(iconPath);
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        click: () => windowManager.showPrimaryWindow(),
-        label: locale.getText('trayOpen'),
-      }, {
-        click: () => app.quit(),
-        label: locale.getText('trayQuit'),
-      },
-    ]);
+  appIcon = new Tray(iconPath);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      click: () => windowManager.showPrimaryWindow(),
+      label: locale.getText('trayOpen'),
+    }, {
+      click: () => app.quit(),
+      label: locale.getText('trayQuit'),
+    },
+  ]);
 
-    appIcon.setToolTip(config.NAME);
-    appIcon.setContextMenu(contextMenu);
-    appIcon.on('click', () => windowManager.showPrimaryWindow());
-  }
+  appIcon.setToolTip(config.NAME);
+  appIcon.setContextMenu(contextMenu);
+  appIcon.on('click', () => windowManager.showPrimaryWindow());
 };
 
 const _updateBadgeIcon = (win, count) => {
